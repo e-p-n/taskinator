@@ -1,11 +1,13 @@
 var buttonEl = document.querySelector("#save-task");
-var taskToDoEl = document.querySelector("#tasks-to-do")
+var taskToDoEl = document.querySelector("#tasks-to-do");
+var formEl = document.querySelector("#task-form");
 
-var createTaskHandler = function() {
+var createTaskHandler = function(event) {
+    event.preventDefault();
     let listItemEl = document.createElement("li");
     listItemEl.className = "task-item";
     listItemEl.textContent = "This is a new task.";
     taskToDoEl.appendChild(listItemEl);
 }
 
-buttonEl.addEventListener("click", createTaskHandler);
+formEl.addEventListener("submit", createTaskHandler);
