@@ -271,48 +271,16 @@ var saveTasks = function() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 var loadTasks = function() {
-    let localTasks = localStorage.getItem("tasks");
-    if (localTasks !== null) {
-        tasks = JSON.parse(localTasks);
-    } 
-
-    for (i = 0; i < tasks.length; i++) {
-        taskIdCounter = tasks[i].id + 1;
-        let listItemEl = document.createElement("li");
-        listItemEl.className = "task-item";
-    
-        // add task id as a custom attribute
-        listItemEl.setAttribute("data-task-id", tasks[i].id);
-        listItemEl.setAttribute("draggable", "true")
-    
-        //create div to hold task info and add to list item
-        let taskInfoEl = document.createElement("div");
-        //give it a class name
-        taskInfoEl.className = "task-info";
-        //add HTML to div
-        taskInfoEl.innerHTML = "<h3 class='task-name'>" + tasks[i].name + "</h3><span class='task-type'>" + tasks[i].type + "</span>";
-        listItemEl.appendChild(taskInfoEl);
-
-        let taskActionsEl =  createTaskActions(tasks[i].id);
-        listItemEl.appendChild(taskActionsEl);
-
-
-    let statusSelectEl = listItemEl.querySelector("select[name='status-change']");
-     
-        // add entire list item to list
-        if (tasks[i].status === "in progress") {
-            tasksInProgressEl.appendChild(listItemEl);
-            statusSelectEl.selectedIndex = 1;
-        } else if (tasks[i].status === "completed") {
-            tasksCompletedEl.appendChild(listItemEl);
-            statusSelectEl.selectedIndex = 2;
-        } else {
-            taskToDoEl.appendChild(listItemEl);
-            statusSelectEl.selectedIndex = 0;
-        }
-
-    
+    let savedTasks = localStorage.getItem("tasks");
+    if (!savedTasks) {
+        return false;
     }
+    savedTasks = JSON.parse(savedTasks);
+
+    for (var i = 0; i < savedTasks.length; i++) {
+        // pass each object into the createTasksEl() function
+        createTaskEl(savedTasks[i]);
+    } 
 }
 
 // RUN CODE
