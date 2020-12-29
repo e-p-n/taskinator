@@ -113,8 +113,6 @@ var createTaskActions = function(taskId) {
         // append to select
         statusSelectEl.appendChild(statusOptionEl);
     }
-
-
     return actionContainerEl;
 };
 
@@ -143,6 +141,7 @@ var deleteTask = function(taskId) {
         for (var i = 0; i < tasks.length; i++) {
             // if tasks[i].id doesn't match the value of taskId, let's keep that task and push it into the new array
             if (tasks[i].id !== parseInt(taskId)){
+                console.log(updatedTaskArr);
                 updatedTaskArr.push(tasks[i]);
             }
         }
@@ -278,7 +277,7 @@ var loadTasks = function() {
     } 
 
     for (i = 0; i < tasks.length; i++) {
-        taskIdCounter = tasks[i];
+        taskIdCounter = tasks[i].id + 1;
         let listItemEl = document.createElement("li");
         listItemEl.className = "task-item";
     
