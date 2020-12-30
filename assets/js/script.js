@@ -1,4 +1,7 @@
 // GLOBAL VARIABLES
+var types = ["Homework", "Chore"];
+var taskTypeEl = document.querySelector("#task-type");
+console.log(taskTypeEl);
 var tasks = [];
 var taskIdCounter = 0;
 var buttonEl = document.querySelector("#save-task");
@@ -10,6 +13,41 @@ var pageContentEl = document.querySelector("#page-content");
 
 
 // FUNCTIONS
+
+// add tasks types to form drop down
+var  readTaskType = function(newType) {
+    console.log(newType);
+    
+    // create option element
+    let typeOptionEl = document.createElement("option");
+    typeOptionEl.textContent = newType;
+    typeOptionEl.setAttribute("value", newType);
+
+    // append to select
+    taskTypeEl.appendChild(typeOptionEl);
+
+}
+for (i=0; i < types.length; i++) {
+    readTaskType(types[i]);
+}
+
+var addTaskType = function() {
+    if (taskTypeEl.value === "Add") {
+        let newTask = prompt("Enter name for new task type.");
+        if (newTask) {
+            /*let newTaskTypeEl = document.createElement("option");
+            newTaskTypeEl.textContent = newTask;
+            newTaskTypeEl.setAttribute("value", newTask.toLowerCase());
+            taskTypeEl.appendChild(newTaskTypeEl);*/
+            readTaskType(newTask);
+            taskTypeEl.value = newTask;
+
+
+        } else {
+            taskTypeEl.value = "Pick";
+        }
+    } 
+}
 
 // process form for adding new tasks
 var taskFormHandler = function(event) {
@@ -73,6 +111,8 @@ var createTaskEl = function(taskDataObj) {
    saveTasks();
  
 };
+
+
 
 var createTaskActions = function(taskId) {
     let actionContainerEl = document.createElement("div");
@@ -288,6 +328,8 @@ loadTasks();
 
 formEl.addEventListener("submit", taskFormHandler);
 
+
+
 pageContentEl.addEventListener("click", taskButtonHandler);
 
 pageContentEl.addEventListener("change", taskStatusChangeHandler);
@@ -299,4 +341,6 @@ pageContentEl.addEventListener("dragover", dropZoneDragHandler);
 pageContentEl.addEventListener("drop", dropTaskHandler);
 
 pageContentEl.addEventListener("dragleave", dragLeaveHandler);
+
+taskTypeEl.addEventListener("change", addTaskType);
 
