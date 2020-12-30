@@ -1,7 +1,6 @@
 // GLOBAL VARIABLES
-var types = ["Homework", "Chore"];
+var types = [];
 var taskTypeEl = document.querySelector("#task-type");
-console.log(taskTypeEl);
 var tasks = [];
 var taskIdCounter = 0;
 var buttonEl = document.querySelector("#save-task");
@@ -16,7 +15,6 @@ var pageContentEl = document.querySelector("#page-content");
 
 // add tasks types to form drop down
 var  readTaskType = function(newType) {
-    console.log(newType);
     
     // create option element
     let typeOptionEl = document.createElement("option");
@@ -27,22 +25,30 @@ var  readTaskType = function(newType) {
     taskTypeEl.appendChild(typeOptionEl);
 
 }
-for (i=0; i < types.length; i++) {
-    readTaskType(types[i]);
+
+// Load task types to "Pick a task type" dropdown from local storage
+var loadTasksTypes = function() {
+    let savedTaskTypes = localStorage.getItem("taskTypes");
+    if (!savedTaskTypes) {
+        return false;
+    }
+    types = JSON.parse(savedTaskTypes);
+
+    for (var i = 0; i < types.length; i++) {
+        // pass each object into the readTaskType() function
+        readTaskType(types[i]);
+    } 
 }
 
+// Add new task typ to local storage and drop down and make it the selcted option. 
 var addTaskType = function() {
     if (taskTypeEl.value === "Add") {
-        let newTask = prompt("Enter name for new task type.");
-        if (newTask) {
-            /*let newTaskTypeEl = document.createElement("option");
-            newTaskTypeEl.textContent = newTask;
-            newTaskTypeEl.setAttribute("value", newTask.toLowerCase());
-            taskTypeEl.appendChild(newTaskTypeEl);*/
-            readTaskType(newTask);
-            taskTypeEl.value = newTask;
-
-
+        let newTaskType = prompt("Enter name for new task type.");
+        if (newTaskType) {
+            readTaskType(newTaskType);
+            taskTypeEl.value = newTaskType;
+            types.push(newTaskType);
+            saveTaskType();
         } else {
             taskTypeEl.value = "Pick";
         }
@@ -181,7 +187,6 @@ var deleteTask = function(taskId) {
         for (var i = 0; i < tasks.length; i++) {
             // if tasks[i].id doesn't match the value of taskId, let's keep that task and push it into the new array
             if (tasks[i].id !== parseInt(taskId)){
-                console.log(updatedTaskArr);
                 updatedTaskArr.push(tasks[i]);
             }
         }
@@ -310,6 +315,13 @@ var dragLeaveHandler = function(event) {
 var saveTasks = function() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
+
+var saveTaskType = function() {
+    localStorage.setItem("taskTypes",JSON.stringify(types));
+}
+
+
+
 var loadTasks = function() {
     let savedTasks = localStorage.getItem("tasks");
     if (!savedTasks) {
@@ -325,6 +337,7 @@ var loadTasks = function() {
 
 // RUN CODE
 loadTasks();
+loadTasksTypes();
 
 formEl.addEventListener("submit", taskFormHandler);
 
