@@ -9,9 +9,31 @@ var tasksInProgressEl = document.querySelector("#tasks-in-progress");
 var tasksCompletedEl = document.querySelector("#tasks-completed");
 var formEl = document.querySelector("#task-form");
 var pageContentEl = document.querySelector("#page-content");
+var dueDateEl = document.querySelector("#due-date");
+var today = new Date();
 
 
 // FUNCTIONS
+
+//format a date to yyyy-mm-dd style
+function formatDate(date) {
+    let yyyy = date.getFullYear();
+    let mm = date.getMonth()+1;
+    if (mm<10) {
+        mm = "0" + mm;
+    }
+    let dd = date.getDate();
+    if (dd<10) {
+        dd = "0" + dd;
+    }
+    let formattedDate = yyyy + "-" + mm + "-" + dd;
+    return formattedDate;
+}
+
+function addMinDateToForm() {
+    let minDate = formatDate(today);
+    dueDateEl.setAttribute("min", minDate);
+}
 
 // add tasks types to form drop down
 var  readTaskType = function(newType) {
@@ -60,10 +82,13 @@ var taskFormHandler = function(event) {
     event.preventDefault();
     let taskNameInput = document.querySelector("input[name='task-name']").value;
     let taskTypeInput = document.querySelector("select[name='task-type']").value;
+    let taskDueDateInput = document.querySelector("input[name='due-date']").value;
     //Check to confirm code was filled in
     if (!taskNameInput || !taskTypeInput) {
         alert("You need to fill out the task form!");
         return false;
+    } else if (!taskDueDateInput) {
+        taskDueDateInput = "none";
     }
     formEl.reset();
 
@@ -71,13 +96,14 @@ var taskFormHandler = function(event) {
 
     if (isEdit) {
         var taskId = formEl.getAttribute("data-task-id");
-        completeEditTask(taskNameInput, taskTypeInput, taskId);
+        completeEditTask(taskNameInput, taskTypeInput, taskDueDateInput, taskId);
     } else {
 
     // package up data as an object
         let taskDataObj = {
             name: taskNameInput,
             type: taskTypeInput,
+            dueDate: taskDueDateInput,
             status: "to do"
         }
         createTaskEl(taskDataObj);
@@ -99,7 +125,14 @@ var createTaskEl = function(taskDataObj) {
     //give it a class name
     taskInfoEl.className = "task-info";
     //add HTML to div
-    taskInfoEl.innerHTML = "<h3 class='task-name'>" + taskDataObj.name + "</h3><span class='task-type'>" + taskDataObj.type + "</span>";
+    let createdName = "<h3 class='task-name'>" + taskDataObj.name + "</h3>";
+    let createdType = "<span class='task-type'>" + taskDataObj.type + "</span> <br />";
+    let createdDueDate = "<span class='due'></span><span class='due-date'> </span>";
+    if (taskDataObj.dueDate !== "none") {
+        createdDueDate = "<span class='due'>Due: </span><span class='due-date'>" + taskDataObj.dueDate + "</span>";
+    }
+
+    taskInfoEl.innerHTML = createdName + createdType + createdDueDate;
     listItemEl.appendChild(taskInfoEl);
 
     taskDataObj.id = taskIdCounter;
@@ -207,6 +240,11 @@ var editTask = function(taskId) {
     var taskType = taskSelected.querySelector("span.task-type").textContent;
     document.querySelector("select[name='task-type']").value = taskType;
 
+    if (taskSelected.querySelector("span.due-date")) {
+        var dueDate = taskSelected.querySelector("span.due-date").textContent;
+        document.querySelector("input[name='due-date']").value = dueDate;
+    }
+ 
     //update button label
     document.querySelector("#save-task").textContent = "Save Task";
 
@@ -214,17 +252,26 @@ var editTask = function(taskId) {
     formEl.setAttribute("data-task-id", taskId);
 };
 
-var completeEditTask = function(taskName, taskType, taskId) {
+var completeEditTask = function(taskName, taskType, taskDueDate, taskId) {
     // find the matching task list item
     var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
 
     // set new values
     taskSelected.querySelector("h3.task-name").textContent = taskName;
     taskSelected.querySelector("span.task-type").textContent = taskType;
+    if (taskDueDate === "none") {
+        taskSelected.querySelector("span.due").textContent = "";
+        taskSelected.querySelector("span.due-date").textContent = "";
+    } else {
+        taskSelected.querySelector("span.due").textContent = "Due: ";
+        taskSelected.querySelector("span.due-date").textContent = taskDueDate;
+    }
+    
     for (var i=0; i < tasks.length; i++) {
         if (tasks[i].id === parseInt(taskId)) {
             tasks[i].name = taskName;
             tasks[i].type = taskType;
+            tasks[i].dueDate = taskDueDate;
         }
     }
 
@@ -269,6 +316,7 @@ var dragTaskHandler = function(event) {
     let taskId = event.target.getAttribute("data-task-id");
     event.dataTransfer.setData("text/plain", taskId);
 }
+
 
 var dropZoneDragHandler = function(event) {
     var taskListEl = event.target.closest(".task-list");
@@ -338,6 +386,7 @@ var loadTasks = function() {
 // RUN CODE
 loadTasks();
 loadTasksTypes();
+addMinDateToForm();
 
 formEl.addEventListener("submit", taskFormHandler);
 

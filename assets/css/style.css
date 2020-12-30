@@ -118,6 +118,13 @@ footer {
 }
 
 .task-type {
+  font-weight: bold;
+}
+#due-date {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 1.65rem;
+}
+.task-type, .due-date, .due {
   color: var(--secondary);
   font-size: 1.55rem;
 }
