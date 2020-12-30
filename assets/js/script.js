@@ -1,4 +1,6 @@
 // GLOBAL VARIABLES
+var types = [];
+var taskTypeEl = document.querySelector("#task-type");
 var tasks = [];
 var taskIdCounter = 0;
 var buttonEl = document.querySelector("#save-task");
@@ -10,6 +12,48 @@ var pageContentEl = document.querySelector("#page-content");
 
 
 // FUNCTIONS
+
+// add tasks types to form drop down
+var  readTaskType = function(newType) {
+    
+    // create option element
+    let typeOptionEl = document.createElement("option");
+    typeOptionEl.textContent = newType;
+    typeOptionEl.setAttribute("value", newType);
+
+    // append to select
+    taskTypeEl.appendChild(typeOptionEl);
+
+}
+
+// Load task types to "Pick a task type" dropdown from local storage
+var loadTasksTypes = function() {
+    let savedTaskTypes = localStorage.getItem("taskTypes");
+    if (!savedTaskTypes) {
+        return false;
+    }
+    types = JSON.parse(savedTaskTypes);
+
+    for (var i = 0; i < types.length; i++) {
+        // pass each object into the readTaskType() function
+        readTaskType(types[i]);
+    } 
+}
+
+// Add new task typ to local storage and drop down and make it the selcted option. 
+var addTaskType = function() {
+    if (taskTypeEl.value === "Add") {
+        let newTaskType = prompt("Enter name for new task type.");
+        if (newTaskType) {
+            readTaskType(newTaskType);
+            taskTypeEl.value = newTaskType;
+            types.push(newTaskType);
+            saveTaskType();
+        } else {
+            taskTypeEl.value = "Pick";
+        }
+    } 
+}
 
 // process form for adding new tasks
 var taskFormHandler = function(event) {
@@ -73,6 +117,8 @@ var createTaskEl = function(taskDataObj) {
    saveTasks();
  
 };
+
+
 
 var createTaskActions = function(taskId) {
     let actionContainerEl = document.createElement("div");
@@ -141,7 +187,6 @@ var deleteTask = function(taskId) {
         for (var i = 0; i < tasks.length; i++) {
             // if tasks[i].id doesn't match the value of taskId, let's keep that task and push it into the new array
             if (tasks[i].id !== parseInt(taskId)){
-                console.log(updatedTaskArr);
                 updatedTaskArr.push(tasks[i]);
             }
         }
@@ -270,6 +315,13 @@ var dragLeaveHandler = function(event) {
 var saveTasks = function() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
+
+var saveTaskType = function() {
+    localStorage.setItem("taskTypes",JSON.stringify(types));
+}
+
+
+
 var loadTasks = function() {
     let savedTasks = localStorage.getItem("tasks");
     if (!savedTasks) {
@@ -285,8 +337,11 @@ var loadTasks = function() {
 
 // RUN CODE
 loadTasks();
+loadTasksTypes();
 
 formEl.addEventListener("submit", taskFormHandler);
+
+
 
 pageContentEl.addEventListener("click", taskButtonHandler);
 
@@ -299,4 +354,6 @@ pageContentEl.addEventListener("dragover", dropZoneDragHandler);
 pageContentEl.addEventListener("drop", dropTaskHandler);
 
 pageContentEl.addEventListener("dragleave", dragLeaveHandler);
+
+taskTypeEl.addEventListener("change", addTaskType);
 
